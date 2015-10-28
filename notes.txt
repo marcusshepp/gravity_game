@@ -1,0 +1,5 @@
+input:
+planets x,y,mass
+
+output:
+mouse x,y,power

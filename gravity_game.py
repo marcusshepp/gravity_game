@@ -2,7 +2,7 @@ from pygame import *
 # import pygame._view
 from random import *
 from math import *
-
+import time as t
 # #################################################### #
 # ##                                                ## #
 # ##  This game was made by Jeremy Gagnier in 2010  ## #
@@ -64,35 +64,43 @@ class solar_system:
                 else:
                     rand_x = randint(planet_rad,width-planet_rad)
                     rand_y = randint(planet_rad,height-planet_rad)
-
             gravity = round(goal_rad*randint(8,round(12+difficulty/10))/10)
             self.planets.append([rand_x,rand_y,planet_rad,gravity,gravity/planet_rad])
+        # print(self.planets)
+        # with open("current_board.txt", "w") as my_file:
+        #     my_file.write(str(self.planets))
 
     def draw(self):
         """Draw the planets and the player."""
 
         global launch_start,power,max_power
 
+        # home planet
         draw.circle(screen,(0,0,255),self.home_planet[0:2],self.home_planet[2])
         message = density_font.render(str(round(self.home_planet[4],2)),1,(255,255,255))
         w,h = density_font.size(str(round(self.home_planet[4],2)))
         screen.blit(message,(self.home_planet[0]-w/2,self.home_planet[1]-h/2))
 
+        # target planet
         draw.circle(screen,(0,255,0),self.goal_planet[0:2],self.goal_planet[2])
         message = density_font.render(str(round(self.goal_planet[4],2)),1,(255,255,255))
         w,h = density_font.size(str(round(self.goal_planet[4],2)))
         screen.blit(message,(self.goal_planet[0]-w/2,self.goal_planet[1]-h/2))
 
+        # enemy planets
         for i in self.planets:
             draw.circle(screen,(255,0,0),i[0:2],i[2])
             message = density_font.render(str(round(i[4],2)),1,(255,255,255))
             w,h = density_font.size(str(round(i[4],2)))
             screen.blit(message,(i[0]-w/2,i[1]-h/2))
+
+        # player
         if self.player != []:
             x2 = self.player[0]-self.player[2]/6
             y2 = self.player[1]-self.player[3]/6
             draw.line(screen,(125,0,125),(self.player[0],self.player[1]),(x2,y2),2)
 
+        # launch scaler
         draw.rect(screen,(0,0,0),(740,10,50,100),5)
         draw.rect(screen,(0,255,0),(740,10+100-power*(100/max_power),50,power*(100/max_power)))
 
@@ -181,10 +189,10 @@ while cont:             # Wait for left click
     for evnt in event.get():
         if evnt.type == QUIT:   # Closes the game
             cont = 0
-
-        if evnt.type == KEYDOWN:
-            if evnt.key == K_ESCAPE: # Closes the game
-                cont = 0
+        elif evnt.type == KEYDOWN:
+            cont = 0
+        elif evnt.type == MOUSEBUTTONUP:
+            cont = 0
 
     time.wait(30)
 
@@ -202,7 +210,15 @@ level = 0
 maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
 
 game.load_map(maps[level])  # Load the first level
+def ai_get_mouse():
+    return 500, 450
 
+def ai_click():
+    yield 1, 0
+    # t.sleep(2)
+    # yield 0
+    # return
+lc = 1
 cont = 1
 while cont:
     for evnt in event.get():
@@ -215,30 +231,36 @@ while cont:
                 game.player = []
                 power = min_power
             if evnt.key == K_n:      # Makes a new map
-                game.new_game(4,0)
+                game.new_game(1,0)
                 game.player = []
                 power = min_power
 
-    mx,my = mouse.get_pos()
-    lc = mouse.get_pressed()[0]
+    # mx,my = mouse.get_pos()
+    # lc = mouse.get_pressed()[0]
+
+    mx, my = ai_get_mouse()
+
+    print(lc)
 
     f_angle = atan((my-game.home_planet[1])/(mx-game.home_planet[0]+0.00000001))
     if mx < game.home_planet[0]: f_angle += radians(180)
     x = cos(f_angle)*game.home_planet[2]+game.home_planet[0]
     y = sin(f_angle)*game.home_planet[2]+game.home_planet[1]
 
-    game.launch(x,y,lc,f_angle)
+    power = max_power
 
+    game.launch(x,y,lc,f_angle)
+    lc = 0
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
     if action < 0:
         game.player = []
-        power = min_power
+        # power = min_power
     elif action > 0:
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)
         game.player = []
-        power = min_power
+        # power = min_power
 
     # Update screen
     screen.fill((255,255,255))
