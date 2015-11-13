@@ -1,5 +1,8 @@
 input:
-planets x,y,mass
+max 3, planets x, y, mass
 
 output:
-mouse x,y,power
+x,y
+
+
+in: 30 nodes (10 each planet())
