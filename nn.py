@@ -19,40 +19,30 @@ def enemy_planets(file_path):
 
 # print enemy_planets("maps/map1.md")
 
+def to_bin(data, length):
+    return bin(int(data))[2:].zfill(length)
+    
 def planet_to_bin_rep(planets):
-    planet_one_x = bin(int(planets[0][0]))
-    planet_one_y = bin(int(planets[0][1]))
-    planet_one_m = bin(int(planets[0][4]))
-    planet_two_x = bin(int(planets[1][0]))
-    planet_two_y = bin(int(planets[1][1]))
-    planet_two_m = bin(int(planets[1][4]))
-    planet_three_x = bin(int(planets[2][0]))
-    planet_three_y = bin(int(planets[2][1]))
-    planet_three_m = bin(int(planets[2][4]))
-    ml = []
-    ml.append(planet_one_x[2:])
-    ml.append(planet_one_y[2:])
-    ml.append(planet_one_m[2:])
-    ml.append(planet_two_x[2:])
-    ml.append(planet_two_y[2:])
-    ml.append(planet_two_m[2:])
-    ml.append(planet_three_x[2:])
-    ml.append(planet_three_y[2:])
-    ml.append(planet_three_m[2:])
-    for item in ml:
-        if len(item) > 2 and len(item) < 8:
-            diff = 8 - len(item)
-            print diff
-            item = list(item)
-            print item
-            for i in range(diff):
-                item.insert(0, 0)
-            item = [str(i) for i in item]
-            print "".join(item)
-            print item
-    return ml
+    print planets
+    planet_one = [to_bin(planets[0][0], 10), 
+                  to_bin(planets[0][1], 10), 
+                  to_bin(planets[0][4], 3)]
+    planet_two = [to_bin(planets[1][0], 10), 
+                  to_bin(planets[1][1], 10), 
+                  to_bin(planets[1][4], 3)]
+    planet_three = [to_bin(planets[2][0], 10), 
+                    to_bin(planets[2][1], 10), 
+                    to_bin(planets[2][4], 3)]
+    return planet_one, planet_two, planet_three
 
-print planet_to_bin_rep(enemy_planets("maps/map1.md"))
+def full_input(l):
+    value = ""
+    for i in l:
+        for d in i:
+            value += d
+    return [i for i in value]
+
+print len(full_input(planet_to_bin_rep(planets)))
 
 def estimate_launch():
     pass
