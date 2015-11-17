@@ -16,22 +16,21 @@ def enemy_planets(file_path):
         inputd.close()
     return _planets
 
-
 # print enemy_planets("maps/map1.md")
 
 def to_bin(data, length):
     return bin(int(data))[2:].zfill(length)
-    
+
 def planet_to_bin_rep(planets):
     print planets
-    planet_one = [to_bin(planets[0][0], 10), 
-                  to_bin(planets[0][1], 10), 
+    planet_one = [to_bin(planets[0][0], 10),
+                  to_bin(planets[0][1], 10),
                   to_bin(planets[0][4], 3)]
-    planet_two = [to_bin(planets[1][0], 10), 
-                  to_bin(planets[1][1], 10), 
+    planet_two = [to_bin(planets[1][0], 10),
+                  to_bin(planets[1][1], 10),
                   to_bin(planets[1][4], 3)]
-    planet_three = [to_bin(planets[2][0], 10), 
-                    to_bin(planets[2][1], 10), 
+    planet_three = [to_bin(planets[2][0], 10),
+                    to_bin(planets[2][1], 10),
                     to_bin(planets[2][4], 3)]
     return planet_one, planet_two, planet_three
 
