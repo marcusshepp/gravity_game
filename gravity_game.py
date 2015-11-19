@@ -188,9 +188,13 @@ level = 0
 maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
 
 game.load_map(maps[level])  # Load the first level
-mx, my = evolve(1, "maps/map1.md") # mjs
+mx, my = evolve(1, maps[level]) # mjs
 lc = 1
 cont = 1
+
+fits = [] # mjs
+player_pos = []
+
 while cont:
     for evnt in event.get():
         if evnt.type == QUIT:   # Closes the game
@@ -224,10 +228,14 @@ while cont:
     game.launch(x,y,lc,f_angle)
     lc = 0
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
+
     if action < 0:
+        fits.append(int(round(player_pos[len(player_pos) - 1]))) # mjs
+        fits.append(int(round(player_pos[len(player_pos) - 2]))) # mjs
+        print(fits)
         game.player = []
         # power = min_power
-        mx, my = evolve(1, "maps/map1.md")
+        mx, my = evolve(1, maps[level]) # mjs
         lc = 1
     elif action > 0:
         level += 1
@@ -242,7 +250,9 @@ while cont:
     screen.blit(font1.render(str(mx) + " " + str(my),1,(0,0,0)),(10,540)) # mjs
     game.draw()
     if game.player == []: draw.circle(screen,(255,0,0),(round(x),round(y)),5)
-
+    else:
+        player_pos.append(game.player[0])
+        player_pos.append(game.player[1])
     display.flip()
     time.delay(30)
 
