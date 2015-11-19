@@ -8,6 +8,7 @@ import time as t
 # ##  This game was made by Jeremy Gagnier in 2010  ## #
 # ##                                                ## #
 # #################################################### #
+from GA import evolve # mjs
 
 init()
 
@@ -187,14 +188,7 @@ level = 0
 maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
 
 game.load_map(maps[level])  # Load the first level
-def ai_get_mouse():
-    return 250, 250
-
-def ai_click():
-    yield 1, 0
-    # t.sleep(2)
-    # yield 0
-    # return
+mx, my = evolve(1, "maps/map1.md")
 lc = 1
 cont = 1
 while cont:
@@ -215,7 +209,7 @@ while cont:
     # mx,my = mouse.get_pos()
     # lc = mouse.get_pressed()[0]
 
-    mx, my = ai_get_mouse()
+
 
     # print(lc)
 
@@ -243,6 +237,7 @@ while cont:
 
     # Update screen
     screen.fill((255,255,255))
+    screen.blit(font1.render(str(mx) + " " + str(my),1,(0,0,0)),(10,540)) # mjs
     game.draw()
     if game.player == []: draw.circle(screen,(255,0,0),(round(x),round(y)),5)
 
