@@ -188,7 +188,7 @@ level = 0
 maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
 
 game.load_map(maps[level])  # Load the first level
-mx, my = evolve(1, "maps/map1.md")
+mx, my = evolve(1, "maps/map1.md") # mjs
 lc = 1
 cont = 1
 while cont:
@@ -227,13 +227,15 @@ while cont:
     if action < 0:
         game.player = []
         # power = min_power
+        mx, my = evolve(1, "maps/map1.md")
+        lc = 1
     elif action > 0:
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)
         game.player = []
         # power = min_power
-        lc = 1
+        lc = 0
 
     # Update screen
     screen.fill((255,255,255))
