@@ -69,6 +69,12 @@ def decode_output(out):
     """
     return [int("".join([str(i) for i in out[:10]]), 2), int("".join([str(i) for i in out[10:]]), 2)]
 
+def fitness(chrome):
+    """
+    find the distance between the dying point and the destination planet.
+    """
+    pass
+
 def evolve(gens, current_board):
     """
     for each chrome do
