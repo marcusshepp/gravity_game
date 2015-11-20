@@ -212,8 +212,8 @@ while cont:
                 game.player = []
                 power = min_power
 
-    # mx,my = mouse.get_pos()
-    # lc = mouse.get_pressed()[0]
+    mx,my = mouse.get_pos()
+    lc = mouse.get_pressed()[0]
 
     # print(lc)
 
@@ -226,29 +226,29 @@ while cont:
     power = max_power
 
     game.launch(x,y,lc,f_angle)
-    lc = 0
+    # lc = 0
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
 
     if action < 0:
         deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2])))) # mjs
         print(deaths)
         game.player = []
-        index_of_trys += 1
+        # index_of_trys += 1
         # power = min_power
-        if index_of_trys < len(trys):
-            mx, my = trys[index_of_trys] # mjs
-        else:
-            ga.last_population["deaths"] = deaths
-            ga.evaluate()
-            deaths = []
-        lc = 1
+        # if index_of_trys < len(trys):
+        #     mx, my = trys[index_of_trys] # mjs
+        # else:
+        #     ga.last_population["deaths"] = deaths
+        #     ga.evaluate()
+        #     deaths = []
+        # lc = 1
     elif action > 0:
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)
         game.player = []
         # power = min_power
-        lc = 0
+        # lc = 0
 
     # Update screen
     screen.fill((255,255,255))

@@ -38,7 +38,7 @@ class GeneticTrainer(object):
     def __init__(self, pop_size=0):
         if pop_size != 0:
             self.pop_size = pop_size
-        else: self.pop_size = 15
+        else: self.pop_size = 11
         self.population = [] # weights and thresh's for ann
         self.pop_index = 0
         self.last_population = dict()
