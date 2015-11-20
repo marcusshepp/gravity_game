@@ -8,8 +8,7 @@ import time as t
 # ##  This game was made by Jeremy Gagnier in 2010  ## #
 # ##                                                ## #
 # #################################################### #
-from GA import evolve # mjs
-
+import GA
 init()
 
 size = width,height = 800,600
@@ -183,18 +182,21 @@ max_power = 60
 min_power = 10
 power = 10
 power_direction = 2
-
+player_pos = []
 level = 0
-maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
-
-game.load_map(maps[level])  # Load the first level
-mx, my = evolve(1, maps[level]) # mjs
 lc = 1
 cont = 1
+maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
+game.load_map(maps[level])  # Load the first level
 
-fits = [] # mjs
-player_pos = []
-
+""" mjs """
+deaths = [] # mjs
+index_of_trys = 0 # mjs
+ga = GA.GeneticTrainer()
+trys = ga.create_trys(maps[level]) # mjs
+mx, my = trys[0]
+print(trys)
+""" end mjs """
 while cont:
     for evnt in event.get():
         if evnt.type == QUIT:   # Closes the game
@@ -213,8 +215,6 @@ while cont:
     # mx,my = mouse.get_pos()
     # lc = mouse.get_pressed()[0]
 
-
-
     # print(lc)
 
     f_angle = atan((my-game.home_planet[1])/(mx-game.home_planet[0]+0.00000001))
@@ -230,12 +230,17 @@ while cont:
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
 
     if action < 0:
-        fits.append(int(round(player_pos[len(player_pos) - 1]))) # mjs
-        fits.append(int(round(player_pos[len(player_pos) - 2]))) # mjs
-        print(fits)
+        deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2])))) # mjs
+        print(deaths)
         game.player = []
+        index_of_trys += 1
         # power = min_power
-        mx, my = evolve(1, maps[level]) # mjs
+        if index_of_trys < len(trys):
+            mx, my = trys[index_of_trys] # mjs
+        else:
+            ga.last_population["deaths"] = deaths
+            ga.evaluate()
+            deaths = []
         lc = 1
     elif action > 0:
         level += 1

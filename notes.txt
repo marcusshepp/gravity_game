@@ -1,8 +1,0 @@
-input:
-max 3, planets x, y, mass
-
-output:
-x,y
-
-
-in: 30 nodes (10 each planet())
