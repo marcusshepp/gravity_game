@@ -38,7 +38,7 @@ class GeneticTrainer(object):
     def __init__(self, pop_size=0):
         if pop_size != 0:
             self.pop_size = pop_size
-        else: self.pop_size = 15
+        else: self.pop_size = 2
         self.population = [] # weights and thresh's for ann
         self.pop_index = 0
         self.last_population = dict()
@@ -131,14 +131,17 @@ class GeneticTrainer(object):
         """
 
         """
-        desired_destination = (0, 0)
+        desired_destination = (700,300) # map 1
         fits = []
         for decision in self.last_population["deaths"]:
             d = data_helpers.distance(decision, desired_destination)
+            print(d)
             fitness = 1000 - abs(int(d))
+            print(fitness)
             fits.append(fitness)
         self.fits = fits
-        self.create_new_population()
+        # print(self.fits)
+        self.population = self.create_new_population()
 
     def create_new_population(self):
         """
@@ -151,14 +154,15 @@ class GeneticTrainer(object):
         """
         temp = []
         for chromosome in self.population:
-            partner = self.select_partner()
-            child = GeneticTrainer.mutate(GeneticTrainer.crossover(
-                chromosome, partner))
+            partner = GeneticTrainer.select_partner(self.fits, self.population)
+            child = GeneticTrainer.mutate(GeneticTrainer.crossover(chromosome, partner))
             temp.append(child)
-        self.population = temp
-
-    def select_partner(self):
-        fits = self.fits
+        if self.population == temp:
+            print("they are equal")
+        return temp
+    
+    @staticmethod
+    def select_partner(fits, pop):
         totals = []
         running_total = 0
         for f in fits:
@@ -167,7 +171,7 @@ class GeneticTrainer(object):
         rnd = r.random() * running_total
         for i, t in enumerate(totals):
             if rnd < t:
-                return self.population[i]
+                return pop[i]
 
     @staticmethod
     def crossover(chromosome, partner):
@@ -176,13 +180,13 @@ class GeneticTrainer(object):
         out: children [1]
         rate: 0.5
         """
-        yes = r.randrange(0, 1)
-        if yes:
-            c = chromosome[:400] + partner[400:len(partner)]
-            return c
-        elif not yes:
-            c = r.choice([chromosome, partner])
-            return c
+        # yes = r.randrange(0, 1)
+        # if yes:
+        c = chromosome[:400] + partner[400:len(partner)]
+        return c
+        # elif not yes:
+        #     c = r.choice([chromosome, partner])
+        #     return c
 
     @staticmethod
     def mutate(chromosome):
@@ -190,3 +194,4 @@ class GeneticTrainer(object):
         newvalue = r.randrange(-255, 255)
         chromosome[position] = newvalue
         return chromosome
+        

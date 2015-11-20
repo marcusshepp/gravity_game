@@ -193,6 +193,7 @@ game.load_map(maps[level])  # Load the first level
 deaths = [] # mjs
 index_of_trys = 0 # mjs
 ga = GA.GeneticTrainer()
+global trys
 trys = ga.create_trys(maps[level]) # mjs
 mx, my = trys[0]
 print(trys)
@@ -229,7 +230,7 @@ while cont:
     lc = 0
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
 
-    if action < 0:
+    if action < 0: # if crashed
         deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2])))) # mjs
         print(deaths)
         game.player = []
@@ -241,6 +242,8 @@ while cont:
             ga.last_population["deaths"] = deaths
             ga.evaluate()
             deaths = []
+            trys = ga.create_trys(maps[level])
+            index_of_trys = 0
         lc = 1
     elif action > 0:
         level += 1
