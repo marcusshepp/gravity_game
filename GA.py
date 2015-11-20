@@ -38,7 +38,7 @@ class GeneticTrainer(object):
     def __init__(self, pop_size=0):
         if pop_size != 0:
             self.pop_size = pop_size
-        else: self.pop_size = 5
+        else: self.pop_size = 15
         self.population = [] # weights and thresh's for ann
         self.pop_index = 0
         self.last_population = dict()
@@ -97,7 +97,8 @@ class GeneticTrainer(object):
         in: binary string
         out: x, y corrdinates
         """
-        return [int("".join([str(i) for i in out[:10]]), 2), int("".join([str(i) for i in out[10:]]), 2)]
+        return [int("".join([str(i) for i in out[:10]]), 2), 
+                int("".join([str(i) for i in out[10:]]), 2)]
 
     def create_trys(self, current_board):
         """
@@ -125,7 +126,7 @@ class GeneticTrainer(object):
             x, y = self.decode_output(ann.out())
             self.last_population["trys"].append((x, y))
         return self.last_population["trys"]
-
+        
     def evaluate(self):
         """
 
@@ -151,7 +152,8 @@ class GeneticTrainer(object):
         temp = []
         for chromosome in self.population:
             partner = self.select_partner()
-            child = self.mutate(self.crossover(chromosome, partner))
+            child = GeneticTrainer.mutate(GeneticTrainer.crossover(
+                chromosome, partner))
             temp.append(child)
         self.population = temp
 
@@ -167,7 +169,8 @@ class GeneticTrainer(object):
             if rnd < t:
                 return self.population[i]
 
-    def crossover(self, chromosome, partner):
+    @staticmethod
+    def crossover(chromosome, partner):
         """
         in: parents [2]
         out: children [1]
@@ -181,7 +184,8 @@ class GeneticTrainer(object):
             c = r.choice([chromosome, partner])
             return c
 
-    def mutate(self, chromosome):
+    @staticmethod
+    def mutate(chromosome):
         position = r.randrange(0, len(chromosome))
         newvalue = r.randrange(-255, 255)
         chromosome[position] = newvalue
