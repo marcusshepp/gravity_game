@@ -9,6 +9,8 @@ from math import *
 # ##                                                ## #
 # #################################################### #
 
+import GA
+
 init()
 
 size = width,height = 800,600
@@ -177,32 +179,40 @@ screen.blit(font1.render("Click anywhere to continue...",1,(0,0,0)),(10,540))
 display.flip()
 
 cont = 1
-while cont:             # Wait for left click
+while cont:             
     for evnt in event.get():
-        if evnt.type == MOUSEBUTTONUP:
+        if evnt.type == QUIT:   # Closes the game
             cont = 0
-
+        elif evnt.type == KEYDOWN:
+            cont = 0
+        elif evnt.type == MOUSEBUTTONUP:
+            cont = 0
     time.wait(30)
 
 game = solar_system()   # Initialise the game
-
 held_kn = 0
 launch_start = 0
-
 max_power = 60
 min_power = 10
 power = 10
 power_direction = 2
-
 level = 0
 maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
-
 game.load_map(maps[level])  # Load the first level
-
 cont = 1
-while cont:
+lc = 1
 
-    # Handle events
+ga = GA.GeneticTrainer(pop_size=2)
+ga.set_board(maps[level])
+ga.generate_moves()
+def cpu_move():
+    ga.advance()
+    return ga.next_move()
+deaths = []
+player_pos = []
+done = 1
+
+while cont:
     for evnt in event.get():
         if evnt.type == QUIT:   # Closes the game
             cont = 0
@@ -219,33 +229,38 @@ while cont:
                 game.new_game(4,0)
                 game.player = []
                 power = min_power
-
-    mx,my = mouse.get_pos()
-    lc = mouse.get_pressed()[0]
-
-    f_angle = atan((my-game.home_planet[1])/(mx-game.home_planet[0]+0.00000001))
-    if mx < game.home_planet[0]: f_angle += radians(180)
+    if done:
+        mx, my = cpu_move()
+        f_angle = atan((my-game.home_planet[1])/(mx-game.home_planet[0]+0.00000001))
+        if mx < game.home_planet[0]: f_angle += radians(180)
     x = cos(f_angle)*game.home_planet[2]+game.home_planet[0]
     y = sin(f_angle)*game.home_planet[2]+game.home_planet[1]
-
+    power = max_power
     game.launch(x,y,lc,f_angle)
-
+    lc = 0
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
     if action < 0:
         game.player = []
-        power = min_power
+        deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2]))))
+        lc = 1
+        done = 1
     elif action > 0:
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)
         game.player = []
-        power = min_power
-
+        lc = 0
+    else:
+        done = 0
+        
     # Update screen
     screen.fill((255,255,255))
+    screen.blit(font1.render(str(mx) + " " + str(my),1,(0,0,0)),(10,540))
     game.draw()
     if game.player == []: draw.circle(screen,(255,0,0),(round(x),round(y)),5)
-
+    else:
+        player_pos.append(game.player[0])
+        player_pos.append(game.player[1])
     display.flip()
     time.delay(30)
 

@@ -1,6 +1,9 @@
 import random as r
 
 def select_partner(fits, pop):
+    """
+    Mimics weighted selection with replacement.
+    """
     totals = []
     running_total = 0
     for f in fits:
@@ -16,6 +19,7 @@ def crossover(chromosome, partner):
     in: parents [2]
     out: children [1]
     rate: 0.5
+    Crosses two chromosomes at their mid point.
     """
     # yes = r.randrange(0, 1)
     # if yes:
@@ -26,6 +30,9 @@ def crossover(chromosome, partner):
     #     return c
 
 def mutate(chromosome):
+    """
+    mutates a random allel with rate of 1.
+    """
     position = r.randrange(0, len(chromosome))
     newvalue = r.randrange(-255, 255)
     chromosome[position] = newvalue

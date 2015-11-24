@@ -28,9 +28,9 @@ import random as r
 
 import net
 import data_helpers
-import ga_logic
+import biological_model
 
-class GeneticTrainer(object):
+class GeneticTrainer:
     """
     trains an ann to play a simple game.
     """
@@ -39,9 +39,11 @@ class GeneticTrainer(object):
         if pop_size != 0:
             self.pop_size = pop_size
         else: self.pop_size = 15
-        self.population = [] # weights and thresh's for ann
-        self.pop_index = 0
-        self.last_population = dict()
+        self.population = list() # weights and thresh's for ann
+        self.decoded_population = list() # (x, y) pair corrdinates for game
+        self.current_index = -1
+        self.current_board = str()
+        self.last_generation = dict()
         self.begin = True
 
     def init_population(self):
@@ -72,7 +74,7 @@ class GeneticTrainer(object):
         thresholds2 = chrome[621+45+100+9+5:621+45+100+9+5+20]
         return synapsus0, synapsus1, synapsus2, thresholds0, thresholds1, thresholds2
 
-    def nn_data(self, chrome, path):
+    def nn_data(self, chrome):
         """
         put the data into a dict in order to easily create a nn object.
         in: chromosome, path to current_board
@@ -83,7 +85,7 @@ class GeneticTrainer(object):
         data["num_input_nodes"] = 9
         data["num_hidden_nodes"] = 5
         data["num_output_nodes"] = 20
-        data["inputs"] = data_helpers.get_data(path)
+        data["inputs"] = data_helpers.get_data(self.current_board)
         data["first_weights"] = decoded_chrome[0]
         data["second_weights"] = decoded_chrome[1]
         data["third_weights"] = decoded_chrome[2]
@@ -92,75 +94,50 @@ class GeneticTrainer(object):
         data["third_thresholds"] = decoded_chrome[5]
         return data
 
-    def decode_output(self, out):
+    def decode_network_output(self, out):
         """
-        in: binary string
+        in: binary string, ie output for the 20 output nodes from ANN.
         out: x, y corrdinates
         """
         return [int("".join([str(i) for i in out[:10]]), 2),
                 int("".join([str(i) for i in out[10:]]), 2)]
-
-    def create_trys(self, current_board):
+    
+    def advance(self):
         """
-        in: current_board
-        out: net generated guesses
+        Advances the current index.
+        """
+        if self.current_index < (len(self.decoded_population) - 1):
+            self.current_index += 1
+    
+    def next_move(self):
+        """
+        Gives the current move.
+        """
+        return self.decoded_population[self.current_index]
+    
+    def set_board(self, path_to_board):
+        """
+        Gives the object the path to the current board data being played.
+        """
+        self.current_board = path_to_board
+        
+    def generate_moves(self):
+        """
+        Given the current board creates a decoded population
+        of moves to be used tested in the game.
         """
         if self.begin:
-            """
-            if its the first time accessing a population of guesses
-            call the initial function to create said population.
-            """
             self.init_population()
-            population = self.population
             self.begin = False
-        else:
-            population = self.population
-        # print( "population: ", population)
-        self.last_population["trys"] = []
-        for chrome in population:
-            """
-            create a net based on the current chromosome
-            appends to the trys list in self
-            """
-            data_for_network = self.nn_data(chrome, current_board)
-            ann = net.NeuralNetwork(data_for_network)
-            # print("ann.out: ", ann.out)
-            x, y = self.decode_output(ann.out())
-            self.last_population["trys"].append((x, y))
-        # print(self.last_population["trys"])
-        return self.last_population["trys"]
-
-    def evaluate(self):
-        """
-
-        """
-        desired_destination = (700,300) # map 1
-        fits = []
-        for decision in self.last_population["deaths"]:
-            d = data_helpers.distance(decision, desired_destination)
-            print("distance: ", d)
-            fitness = 1000 - abs(int(d))
-            print("fitness: ", fitness)
-            fits.append(fitness)
-        # print(self.fits)
-        return self.create_new_population(fits, self.population)
-
-    def create_new_population(self, fits, pop):
-        """
-        for p in pop do
-            select partner
-            cross over
-            mutate
-            append
-        pop = pop_container
-        """
-        temp = []
-        print("length of fits: ", len(fits))
-        print("length of pop: ", len(pop))
-        for chromosome in pop:
-            partner = ga_logic.select_partner(fits, self.population)
-            child = ga_logic.mutate(ga_logic.crossover(chromosome, partner))
-            temp.append(child)
-        if self.population == temp:
-            print("created population is equal to old population")
-        return temp
+        self.decoded_population = list()
+        for chromosome in self.population:
+            # print(chromosome)
+            network_info = self.nn_data(chromosome)
+            # print(network_info)
+            artificial_neural_network = net.NeuralNetwork(network_info)
+            x, y = self.decode_network_output(artificial_neural_network.out())
+            self.decoded_population.append((x, y))
+        print(self.decoded_population)
+    
+    
+    

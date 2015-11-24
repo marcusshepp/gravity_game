@@ -4,7 +4,7 @@ def distance(x, y):
     """
     Distance Formula
     in: x = (1, 2), y = (3, 4)
-    out: ???
+    out: the distance between point x and point y
     return the distance between two points.
     """
     return math.sqrt((x[0] - y[0])**2 + (x[1] - y[1])**2)
