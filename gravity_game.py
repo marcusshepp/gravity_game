@@ -1,14 +1,14 @@
 from pygame import *
-# import pygame._view
+# from pygame import _view
 from random import *
 from math import *
-import time as t
+
 # #################################################### #
 # ##                                                ## #
 # ##  This game was made by Jeremy Gagnier in 2010  ## #
 # ##                                                ## #
 # #################################################### #
-import GA
+
 init()
 
 size = width,height = 800,600
@@ -30,17 +30,21 @@ class solar_system:
 
     def new_game(self,planets,difficulty):
         """Create a randomized game map."""
+
         home_rad = randint(40,60)
         self.home_planet = [randint(home_rad,width-home_rad),\
         randint(home_rad,height-home_rad), home_rad,round(home_rad/2),round(home_rad/2)/home_rad]
+
         goal_rad = randint(40-difficulty,60-difficulty)
         rand_x = randint(goal_rad,width-goal_rad)
         rand_y = randint(goal_rad,height-goal_rad)
         while sqrt((rand_x-self.home_planet[0])**2+(rand_y-self.home_planet[1])**2) < home_rad+goal_rad+200:
             rand_x = randint(goal_rad,width-goal_rad)
             rand_y = randint(goal_rad,height-goal_rad)
+
         gravity = round(goal_rad*randint(10,15)/10)
         self.goal_planet = [rand_x,rand_y,goal_rad,gravity,gravity/goal_rad]
+
         self.planets = []
         for i in range(planets-1):
             planet_rad = randint(40+difficulty,60+difficulty)
@@ -60,43 +64,43 @@ class solar_system:
                 else:
                     rand_x = randint(planet_rad,width-planet_rad)
                     rand_y = randint(planet_rad,height-planet_rad)
+
             gravity = round(goal_rad*randint(8,round(12+difficulty/10))/10)
             self.planets.append([rand_x,rand_y,planet_rad,gravity,gravity/planet_rad])
-        # print(self.planets)
-        # with open("current_board.txt", "w") as my_file:
-        #     my_file.write(str(self.planets))
 
     def draw(self):
         """Draw the planets and the player."""
+
         global launch_start,power,max_power
-        # home planet
+
         draw.circle(screen,(0,0,255),self.home_planet[0:2],self.home_planet[2])
         message = density_font.render(str(round(self.home_planet[4],2)),1,(255,255,255))
         w,h = density_font.size(str(round(self.home_planet[4],2)))
         screen.blit(message,(self.home_planet[0]-w/2,self.home_planet[1]-h/2))
-        # target planet
+
         draw.circle(screen,(0,255,0),self.goal_planet[0:2],self.goal_planet[2])
         message = density_font.render(str(round(self.goal_planet[4],2)),1,(255,255,255))
         w,h = density_font.size(str(round(self.goal_planet[4],2)))
         screen.blit(message,(self.goal_planet[0]-w/2,self.goal_planet[1]-h/2))
-        # enemy planets
+
         for i in self.planets:
             draw.circle(screen,(255,0,0),i[0:2],i[2])
             message = density_font.render(str(round(i[4],2)),1,(255,255,255))
             w,h = density_font.size(str(round(i[4],2)))
             screen.blit(message,(i[0]-w/2,i[1]-h/2))
-        # player
         if self.player != []:
             x2 = self.player[0]-self.player[2]/6
             y2 = self.player[1]-self.player[3]/6
             draw.line(screen,(125,0,125),(self.player[0],self.player[1]),(x2,y2),2)
-        # launch scaler
+
         draw.rect(screen,(0,0,0),(740,10,50,100),5)
         draw.rect(screen,(0,255,0),(740,10+100-power*(100/max_power),50,power*(100/max_power)))
 
     def launch(self,x,y,click,angle):
         """Launch the player towards the mouse."""
+
         global launch_start,power,power_direction,max_power,min_power
+
         if self.player == []:
             if not launch_start and click:
                 launch_start = 1
@@ -111,34 +115,45 @@ class solar_system:
 
     def update(self):
         """Update the players' position."""
+
         if self.player != []:
             for i in self.planets:
                 distance = sqrt((i[0]-self.player[0])**2+(i[1]-self.player[1])**2)-i[3]
                 angle = atan((i[1]-self.player[1])/(i[0]-self.player[0]+0.0000001))
                 if i[0] < self.player[0]: angle += radians(180)
                 grav_effect = i[3]*(i[2]/(i[2]+distance))**2
+
                 self.player[2] += cos(angle)*grav_effect/10
                 self.player[3] += sin(angle)*grav_effect/10
+
             for i in (self.home_planet,self.goal_planet):
                 distance = sqrt((i[0]-self.player[0])**2+(i[1]-self.player[1])**2)-i[3]
                 angle = atan((i[1]-self.player[1])/(i[0]-self.player[0]+0.0000001))
                 if i[0] < self.player[0]: angle += radians(180)
                 grav_effect = i[3]*(i[2]/(i[2]+distance))**2
+
                 self.player[2] += cos(angle)*grav_effect/10
                 self.player[3] += sin(angle)*grav_effect/10
+
             self.player[0] += self.player[2]/10
             self.player[1] += self.player[3]/10
+
             for i in self.planets:
                 if sqrt((i[0]-self.player[0])**2+(i[1]-self.player[1])**2) < i[2]:
                     return -1
+
             if sqrt((self.home_planet[0]-self.player[0])**2+\
             (self.home_planet[1]-self.player[1])**2) < self.home_planet[2]:
                 return -1
+
             if sqrt((self.goal_planet[0]-self.player[0])**2+\
             (self.goal_planet[1]-self.player[1])**2) < self.goal_planet[2]:
                 return 1
+
             if self.player[0] < 0 or self.player[0] > 800 or self.player[1] < 0 or self.player[1] > 600:
                 return -1
+
+
         return 0
 
     def load_map(self,filename):
@@ -157,18 +172,14 @@ screen.blit(font1.render("N : Creates a new map.",1,(0,0,0)),(50,200))
 screen.blit(font1.render("Instructions:",1,(0,0,0)),(10,270))
 screen.blit(font1.render("Launch your flier from the blue planet to the green planet.",1,(0,0,0)),(50,310))
 screen.blit(font1.render("Use the red planets to curve your flier's path, but don't crash!",1,(0,0,0)),(50,350))
-screen.blit(font1.render("Press anything to continue...",1,(0,0,0)),(10,540))
+screen.blit(font1.render("Click anywhere to continue...",1,(0,0,0)),(10,540))
 
 display.flip()
 
 cont = 1
 while cont:             # Wait for left click
     for evnt in event.get():
-        if evnt.type == QUIT:   # Closes the game
-            cont = 0
-        elif evnt.type == KEYDOWN:
-            cont = 0
-        elif evnt.type == MOUSEBUTTONUP:
+        if evnt.type == MOUSEBUTTONUP:
             cont = 0
 
     time.wait(30)
@@ -182,97 +193,59 @@ max_power = 60
 min_power = 10
 power = 10
 power_direction = 2
-player_pos = []
+
 level = 0
-lc = 1
-cont = 1
 maps = ['maps/map'+str(i+1)+'.md' for i in range(10)]
+
 game.load_map(maps[level])  # Load the first level
 
-""" mjs """
-deaths = [] # mjs
-index = 0 # mjs
-ga = GA.GeneticTrainer()
-# global trys
-def gettry(map, index, deaths):
-    trys = ga.create_trys(maps[level]) # mjs
-    if index < len(trys):
-        mx, my = ga.create_trys(maps[level])[index]
-        return mx, my
-    else:
-        # create new pop
-        ga.last_population["deaths"] = deaths
-        print("evaluating")
-        ga.evaluate()
-        deaths = []
-        index = 0
-        print("creating new tries")
-        mx, my = ga.create_trys(maps[level])[index]
-        return mx, my
-
-# mx, my = trys[0]
-# print("trys outside loop: ", trys)
-print("======================\n")
-""" end mjs """
+cont = 1
 while cont:
+
+    # Handle events
     for evnt in event.get():
         if evnt.type == QUIT:   # Closes the game
             cont = 0
+
         if evnt.type == KEYDOWN:
             if evnt.key == K_ESCAPE: # Closes the game
                 cont = 0
+
             if evnt.key == K_r:      # Resets the player
                 game.player = []
                 power = min_power
+
             if evnt.key == K_n:      # Makes a new map
-                game.new_game(1,0)
+                game.new_game(4,0)
                 game.player = []
                 power = min_power
 
-    # mx,my = mouse.get_pos()
-    # lc = mouse.get_pressed()[0]
-
-    # print(lc)
-    mx, my = gettry('maps/map1.md', index, deaths)
+    mx,my = mouse.get_pos()
+    lc = mouse.get_pressed()[0]
 
     f_angle = atan((my-game.home_planet[1])/(mx-game.home_planet[0]+0.00000001))
     if mx < game.home_planet[0]: f_angle += radians(180)
     x = cos(f_angle)*game.home_planet[2]+game.home_planet[0]
     y = sin(f_angle)*game.home_planet[2]+game.home_planet[1]
 
-    # limit space
-    power = max_power
-
     game.launch(x,y,lc,f_angle)
-    lc = 0
-    action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
 
-    if action < 0: # if crashed
-        print("crashed")
-        deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2])))) # mjs
-        # print(deaths)
+    action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
+    if action < 0:
         game.player = []
-        index += 1
-        # power = min_power
-        print("index of trys inside loop: ", index)
-        print("======================\n")
-        lc = 1
-    elif action > 0: # hit goal
+        power = min_power
+    elif action > 0:
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)
         game.player = []
-        # power = min_power
-        lc = 0
+        power = min_power
 
     # Update screen
     screen.fill((255,255,255))
-    screen.blit(font1.render(str(mx) + " " + str(my),1,(0,0,0)),(10,540)) # mjs
     game.draw()
     if game.player == []: draw.circle(screen,(255,0,0),(round(x),round(y)),5)
-    else:
-        player_pos.append(game.player[0])
-        player_pos.append(game.player[1])
+
     display.flip()
     time.delay(30)
 
