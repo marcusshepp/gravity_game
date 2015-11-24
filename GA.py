@@ -28,7 +28,7 @@ import random as r
 
 import net
 import data_helpers
-import biological_model
+import biological_model as bm
 
 class GeneticTrainer:
     """
@@ -41,6 +41,7 @@ class GeneticTrainer:
         else: self.pop_size = 15
         self.population = list() # weights and thresh's for ann
         self.decoded_population = list() # (x, y) pair corrdinates for game
+        self.fitness_scores = list()
         self.current_index = -1
         self.current_board = str()
         self.last_generation = dict()
@@ -55,6 +56,10 @@ class GeneticTrainer:
                 chrome.append(r.randrange(-255, 255))
             self.population.append(chrome)
 
+    @property
+    def size_of_population(self):
+        return self.pop_size
+        
     def decode(self, chrome):
         """
         Weights from input to layer one: 621
@@ -139,5 +144,37 @@ class GeneticTrainer:
             self.decoded_population.append((x, y))
         print(self.decoded_population)
     
+    def set_deaths(self, deaths):
+        """
+        Entry point to submit the results from the last population
+        of moves.
+        """
+        self.last_generation["deaths"] = list()
+        for death in deaths:
+            self.last_generation["deaths"].append(death)
+
+    def generate_fitness_scores(self):
+        desired_destination = (700,300) # map 1
+        self.fitness_scores = list()
+        for resulting_destination in self.last_generation["deaths"]:
+            print("resulting_destination: ", resulting_destination)
+            dist = data_helpers.distance(resulting_destination, desired_destination)
+            print("distance: ", dist)
+            fitness = 1000-abs(int(dist))
+            print("fitness: ", fitness)
+            self.fitness_scores.append(fitness)
     
+    def create_new_population(self):
+        pop_container = list()
+        for chromosome in self.population:
+            partner = bm.select_partner(
+                self.fitness_scores, self.population)
+            child = bm.mutate(bm.crossover(chromosome, partner))
+            pop_container.append(child)
+        if self.population == pop_container:
+            print("newly created populous is the same as the old populous")
+        self.population = pop_container    
     
+    def evaluate(self):
+        self.generate_fitness_scores()
+        self.create_new_population()

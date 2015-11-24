@@ -239,12 +239,16 @@ while cont:
     game.launch(x,y,lc,f_angle)
     lc = 0
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
-    if action < 0:
+    if action < 0: # crashed
         game.player = []
         deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2]))))
         lc = 1
         done = 1
-    elif action > 0:
+        if len(deaths) == ga.size_of_population:
+            ga.set_deaths(deaths)
+            ga.evaluate()
+            ga.generate_moves()
+    elif action > 0: # win
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)
