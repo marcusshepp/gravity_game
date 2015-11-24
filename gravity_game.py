@@ -191,12 +191,28 @@ game.load_map(maps[level])  # Load the first level
 
 """ mjs """
 deaths = [] # mjs
-index_of_trys = 0 # mjs
+index = 0 # mjs
 ga = GA.GeneticTrainer()
-global trys
-trys = ga.create_trys(maps[level]) # mjs
-mx, my = trys[0]
-print(trys)
+# global trys
+def gettry(map, index, deaths):
+    trys = ga.create_trys(maps[level]) # mjs
+    if index < len(trys):
+        mx, my = ga.create_trys(maps[level])[index]
+        return mx, my
+    else:
+        # create new pop
+        ga.last_population["deaths"] = deaths
+        print("evaluating")
+        ga.evaluate()
+        deaths = []
+        index = 0
+        print("creating new tries")
+        mx, my = ga.create_trys(maps[level])[index]
+        return mx, my
+
+# mx, my = trys[0]
+# print("trys outside loop: ", trys)
+print("======================\n")
 """ end mjs """
 while cont:
     for evnt in event.get():
@@ -217,6 +233,7 @@ while cont:
     # lc = mouse.get_pressed()[0]
 
     # print(lc)
+    mx, my = gettry('maps/map1.md', index, deaths)
 
     f_angle = atan((my-game.home_planet[1])/(mx-game.home_planet[0]+0.00000001))
     if mx < game.home_planet[0]: f_angle += radians(180)
@@ -231,21 +248,16 @@ while cont:
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
 
     if action < 0: # if crashed
+        print("crashed")
         deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2])))) # mjs
-        print(deaths)
+        # print(deaths)
         game.player = []
-        index_of_trys += 1
+        index += 1
         # power = min_power
-        if index_of_trys < len(trys):
-            mx, my = trys[index_of_trys] # mjs
-        else:
-            ga.last_population["deaths"] = deaths
-            ga.evaluate()
-            deaths = []
-            trys = ga.create_trys(maps[level])
-            index_of_trys = 0
+        print("index of trys inside loop: ", index)
+        print("======================\n")
         lc = 1
-    elif action > 0:
+    elif action > 0: # hit goal
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)

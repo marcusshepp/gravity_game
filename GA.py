@@ -28,7 +28,7 @@ import random as r
 
 import net
 import data_helpers
-
+import ga_logic
 
 class GeneticTrainer(object):
     """
@@ -38,7 +38,7 @@ class GeneticTrainer(object):
     def __init__(self, pop_size=0):
         if pop_size != 0:
             self.pop_size = pop_size
-        else: self.pop_size = 2
+        else: self.pop_size = 15
         self.population = [] # weights and thresh's for ann
         self.pop_index = 0
         self.last_population = dict()
@@ -97,7 +97,7 @@ class GeneticTrainer(object):
         in: binary string
         out: x, y corrdinates
         """
-        return [int("".join([str(i) for i in out[:10]]), 2), 
+        return [int("".join([str(i) for i in out[:10]]), 2),
                 int("".join([str(i) for i in out[10:]]), 2)]
 
     def create_trys(self, current_board):
@@ -115,6 +115,7 @@ class GeneticTrainer(object):
             self.begin = False
         else:
             population = self.population
+        # print( "population: ", population)
         self.last_population["trys"] = []
         for chrome in population:
             """
@@ -123,10 +124,12 @@ class GeneticTrainer(object):
             """
             data_for_network = self.nn_data(chrome, current_board)
             ann = net.NeuralNetwork(data_for_network)
+            # print("ann.out: ", ann.out)
             x, y = self.decode_output(ann.out())
             self.last_population["trys"].append((x, y))
+        # print(self.last_population["trys"])
         return self.last_population["trys"]
-        
+
     def evaluate(self):
         """
 
@@ -135,15 +138,14 @@ class GeneticTrainer(object):
         fits = []
         for decision in self.last_population["deaths"]:
             d = data_helpers.distance(decision, desired_destination)
-            print(d)
+            print("distance: ", d)
             fitness = 1000 - abs(int(d))
-            print(fitness)
+            print("fitness: ", fitness)
             fits.append(fitness)
-        self.fits = fits
         # print(self.fits)
-        self.population = self.create_new_population()
+        return self.create_new_population(fits, self.population)
 
-    def create_new_population(self):
+    def create_new_population(self, fits, pop):
         """
         for p in pop do
             select partner
@@ -153,45 +155,12 @@ class GeneticTrainer(object):
         pop = pop_container
         """
         temp = []
-        for chromosome in self.population:
-            partner = GeneticTrainer.select_partner(self.fits, self.population)
-            child = GeneticTrainer.mutate(GeneticTrainer.crossover(chromosome, partner))
+        print("length of fits: ", len(fits))
+        print("length of pop: ", len(pop))
+        for chromosome in pop:
+            partner = ga_logic.select_partner(fits, self.population)
+            child = ga_logic.mutate(ga_logic.crossover(chromosome, partner))
             temp.append(child)
         if self.population == temp:
-            print("they are equal")
+            print("created population is equal to old population")
         return temp
-    
-    @staticmethod
-    def select_partner(fits, pop):
-        totals = []
-        running_total = 0
-        for f in fits:
-            running_total += f
-            totals.append(running_total)
-        rnd = r.random() * running_total
-        for i, t in enumerate(totals):
-            if rnd < t:
-                return pop[i]
-
-    @staticmethod
-    def crossover(chromosome, partner):
-        """
-        in: parents [2]
-        out: children [1]
-        rate: 0.5
-        """
-        # yes = r.randrange(0, 1)
-        # if yes:
-        c = chromosome[:400] + partner[400:len(partner)]
-        return c
-        # elif not yes:
-        #     c = r.choice([chromosome, partner])
-        #     return c
-
-    @staticmethod
-    def mutate(chromosome):
-        position = r.randrange(0, len(chromosome))
-        newvalue = r.randrange(-255, 255)
-        chromosome[position] = newvalue
-        return chromosome
-        
