@@ -208,3 +208,9 @@ class GeneticTrainer:
             today = str(datetime.datetime.now())
             ann.pickle_data(today)
             print("Generation cap met\nPickled Network object to file.")
+
+    def reset(self, deaths, path_to_board):
+        self.set_deaths(deaths)
+        self.evaluate()
+        self.set_board(path_to_board)
+        self.generate_moves()

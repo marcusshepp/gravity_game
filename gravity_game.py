@@ -26,8 +26,8 @@ class solar_system:
     def __init__(self):
         """This class is for handling all of the major game components."""
         self.planets = []
-        self.home_planet = []
-        self.goal_planet = []
+        self.home_planet = [100,300,40,20,0.5]
+        self.goal_planet = [700,300,40,4,0.1]
         self.player = []
 
     def new_game(self,planets,difficulty):
@@ -202,7 +202,7 @@ game.load_map(maps[level])  # Load the first level
 cont = 1
 lc = 1
 
-ga = GA.GeneticTrainer(pop_size=2, generation_flag=2)
+ga = GA.GeneticTrainer(pop_size=100, generation_flag=25)
 ga.set_board(maps[level])
 ga.generate_moves()
 def cpu_move():
@@ -252,10 +252,14 @@ while cont:
             deaths = list()
     elif action > 0: # win
         level += 1
-        try: game.load_map(maps[level]) # Tries to load the next map
+        try:
+            game.load_map(maps[level]) # Tries to load the next map
+            ga.reset(maps[level])
         except: game.new_game(4,0)
         game.player = []
         lc = 0
+        ga.reset(deaths, maps[level])
+        deaths = list()
     else:
         done = 0
 
