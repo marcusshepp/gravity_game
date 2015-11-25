@@ -10,8 +10,11 @@ is used for finding the corrent Weights and Thesholds to the
 Artificial Neural Network illustrated below. 
 
 
+
 TODO:
  - Pick up where we left off
+
+
 
 To Run:
 
