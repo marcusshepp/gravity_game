@@ -1,14 +1,21 @@
+import os, pickle
+
 class NeuralNetwork(object):
 
     """
     Hold all layers together and propogate values through the net.
     """
 
-    def __init__(self, data):
+    def __init__(self, data=None, pickled=False):
         """
         Hold data ie weights thresholds and input.
         also holds neurons for each layer
         """
+        if pickled:
+            with open("net_output/foo.pickle", "rb") as pickled_data:
+                data = pickle.load(pickled_data)
+                self.data = data
+        else: self.data = data
         # create layers
         self.input_layer = data["num_input_nodes"]
         self.hidden_layer = data["num_hidden_nodes"]
@@ -85,4 +92,9 @@ class NeuralNetwork(object):
         for show
         """
         return self.output_layer_out()
-        
+
+    def pickle_data(self, name):
+        name = name + ".pickle"
+        path = os.path.join("net_output", name)
+        with open(path, "wb") as net_output_pickle:
+            pickle.dump(self.data, net_output_pickle)

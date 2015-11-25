@@ -25,6 +25,7 @@ create new pop
 #
 """
 import random as r
+import datetime
 
 import net
 import data_helpers
@@ -35,17 +36,17 @@ class GeneticTrainer:
     trains an ann to play a simple game.
     """
 
-    def __init__(self, pop_size=0):
-        if pop_size != 0:
-            self.pop_size = pop_size
-        else: self.pop_size = 15
+    def __init__(self, pop_size=15, generation_flag=100):
         self.population = list() # weights and thresh's for ann
         self.decoded_population = list() # (x, y) pair corrdinates for game
         self.fitness_scores = list()
-        self.current_index = -1
         self.current_board = str()
         self.last_generation = dict()
+        self.generations = 0 # number of times a new populous has been created
+        self.current_index = -1
         self.begin = True
+        self.generation_flag = generation_flag
+        self.pop_size = pop_size
 
     def init_population(self):
         for _ in range(self.pop_size):
@@ -180,6 +181,7 @@ class GeneticTrainer:
         Uses the Biological Model to mimic genetic chromosome
         mutation and crossover.
         """
+        self.check_for_generation_cap()
         pop_container = list()
         for chromosome in self.population:
             partner = bm.select_partner(
@@ -189,7 +191,20 @@ class GeneticTrainer:
         if self.population == pop_container:
             print("newly created populous is the same as the old populous")
         self.population = pop_container
+        print("generations: ", self.generations)
+        self.generations += 1
 
     def evaluate(self):
         self.generate_fitness_scores()
         self.create_new_population()
+
+    def check_for_generation_cap(self):
+        if self.generations % self.generation_flag == 0:
+            print(self.fitness_scores)
+            best_chromosome = max(self.fitness_scores)
+            index = [i for i, v in enumerate(self.fitness_scores) if v == best_chromosome][0]
+            data = self.nn_data(self.population[index])
+            ann = net.NeuralNetwork(data)
+            today = str(datetime.datetime.now())
+            ann.pickle_data(today)
+            print("Generation cap met\nPickled Network object to file.")

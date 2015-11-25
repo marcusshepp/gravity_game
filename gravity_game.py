@@ -202,7 +202,7 @@ game.load_map(maps[level])  # Load the first level
 cont = 1
 lc = 1
 
-ga = GA.GeneticTrainer(pop_size=2)
+ga = GA.GeneticTrainer(pop_size=2, generation_flag=2)
 ga.set_board(maps[level])
 ga.generate_moves()
 def cpu_move():
