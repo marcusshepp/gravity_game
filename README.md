@@ -18,8 +18,12 @@ TODO:
 
 Set up:
 
-- python3 required
+
 `pip3 install pygame`
+
+
+- python3 required
+
 
 
 Run:
