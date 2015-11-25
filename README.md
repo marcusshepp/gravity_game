@@ -6,8 +6,8 @@ I am making an Artificial Neural Network for the game.
 
 The Network has the capability to serialize it's `best guess`.
 Biologoical Model ie. the logic for a Genetic Algorthim,
-is used for finding the corrent Weights and Thesholds to the 
-Artificial Neural Network illustrated below. 
+is used for finding the correct Weights and Thesholds to the 
+ann illustrated below. 
 
 
 
