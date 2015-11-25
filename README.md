@@ -16,6 +16,7 @@ TODO:
 To Run:
 
 `pip3 install pygame`
+
 `python3 gravity_game.py`
 
 
