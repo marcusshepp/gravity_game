@@ -191,11 +191,13 @@ game.load_map(maps[level])  # Load the first level
 
 """ mjs """
 deaths = [] # mjs
-index_of_trys = 0 # mjs
-ga = GA.GeneticTrainer()
-trys = ga.create_trys(maps[level]) # mjs
-mx, my = trys[0]
-print(trys)
+index_of_trys = -1 # mjs
+# ga = GA.GeneticTrainer()
+# trys = ga.create_trys(maps[level]) # mjs
+# mx, my = trys[0]
+# print(trys)
+wins = list()
+trys = list()
 """ end mjs """
 while cont:
     for evnt in event.get():
@@ -214,6 +216,12 @@ while cont:
 
     mx,my = mouse.get_pos()
     lc = mouse.get_pressed()[0]
+    if lc:
+        # print("lc")
+        trys.append((mx, my))
+        index_of_trys += 1
+        print("index of trys: ", index_of_trys)
+        print("trys: ", trys)
 
     # print(lc)
 
@@ -230,8 +238,8 @@ while cont:
     action = game.update()  # Will return -1 if the player crashed and 1 if he succeeded
 
     if action < 0:
-        deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2])))) # mjs
-        print(deaths)
+        deaths.append((int(round(player_pos[len(player_pos) - 1])), int(round(player_pos[len(player_pos) - 2])))) # mjs # mjs
+        # print(deaths)
         game.player = []
         # index_of_trys += 1
         # power = min_power
@@ -243,12 +251,16 @@ while cont:
         #     deaths = []
         # lc = 1
     elif action > 0:
+        print("length of trys: ", len(trys))
+        print("index of trys after win: ", index_of_trys)
+        wins.append(trys[index_of_trys]) # mjs
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
         except: game.new_game(4,0)
         game.player = []
         # power = min_power
         # lc = 0
+        print("wins: ", wins)
 
     # Update screen
     screen.fill((255,255,255))
