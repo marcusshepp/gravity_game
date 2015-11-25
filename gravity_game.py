@@ -179,7 +179,7 @@ screen.blit(font1.render("Click anywhere to continue...",1,(0,0,0)),(10,540))
 display.flip()
 
 cont = 1
-while cont:             
+while cont:
     for evnt in event.get():
         if evnt.type == QUIT:   # Closes the game
             cont = 0
@@ -233,6 +233,7 @@ while cont:
         mx, my = cpu_move()
         f_angle = atan((my-game.home_planet[1])/(mx-game.home_planet[0]+0.00000001))
         if mx < game.home_planet[0]: f_angle += radians(180)
+        done = 0
     x = cos(f_angle)*game.home_planet[2]+game.home_planet[0]
     y = sin(f_angle)*game.home_planet[2]+game.home_planet[1]
     power = max_power
@@ -248,6 +249,7 @@ while cont:
             ga.set_deaths(deaths)
             ga.evaluate()
             ga.generate_moves()
+            deaths = list()
     elif action > 0: # win
         level += 1
         try: game.load_map(maps[level]) # Tries to load the next map
@@ -256,7 +258,7 @@ while cont:
         lc = 0
     else:
         done = 0
-        
+
     # Update screen
     screen.fill((255,255,255))
     screen.blit(font1.render(str(mx) + " " + str(my),1,(0,0,0)),(10,540))

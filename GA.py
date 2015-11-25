@@ -59,7 +59,7 @@ class GeneticTrainer:
     @property
     def size_of_population(self):
         return self.pop_size
-        
+
     def decode(self, chrome):
         """
         Weights from input to layer one: 621
@@ -106,26 +106,29 @@ class GeneticTrainer:
         """
         return [int("".join([str(i) for i in out[:10]]), 2),
                 int("".join([str(i) for i in out[10:]]), 2)]
-    
+
     def advance(self):
         """
         Advances the current index.
         """
         if self.current_index < (len(self.decoded_population) - 1):
             self.current_index += 1
-    
+
+    def clear(self):
+        self.current_index = -1
+
     def next_move(self):
         """
         Gives the current move.
         """
         return self.decoded_population[self.current_index]
-    
+
     def set_board(self, path_to_board):
         """
         Gives the object the path to the current board data being played.
         """
         self.current_board = path_to_board
-        
+
     def generate_moves(self):
         """
         Given the current board creates a decoded population
@@ -143,7 +146,8 @@ class GeneticTrainer:
             x, y = self.decode_network_output(artificial_neural_network.out())
             self.decoded_population.append((x, y))
         print(self.decoded_population)
-    
+        self.clear()
+
     def set_deaths(self, deaths):
         """
         Entry point to submit the results from the last population
@@ -154,6 +158,13 @@ class GeneticTrainer:
             self.last_generation["deaths"].append(death)
 
     def generate_fitness_scores(self):
+        """
+        Create Fitness Scores for the current population of
+        Artificial Neural Network data.
+        Takes the death point and finds the distance between that point
+        and desired_destination.
+        Then takes 1000 - absolute value of that distance.
+        """
         desired_destination = (700,300) # map 1
         self.fitness_scores = list()
         for resulting_destination in self.last_generation["deaths"]:
@@ -163,8 +174,12 @@ class GeneticTrainer:
             fitness = 1000-abs(int(dist))
             print("fitness: ", fitness)
             self.fitness_scores.append(fitness)
-    
+
     def create_new_population(self):
+        """
+        Uses the Biological Model to mimic genetic chromosome
+        mutation and crossover.
+        """
         pop_container = list()
         for chromosome in self.population:
             partner = bm.select_partner(
@@ -173,8 +188,8 @@ class GeneticTrainer:
             pop_container.append(child)
         if self.population == pop_container:
             print("newly created populous is the same as the old populous")
-        self.population = pop_container    
-    
+        self.population = pop_container
+
     def evaluate(self):
         self.generate_fitness_scores()
         self.create_new_population()
