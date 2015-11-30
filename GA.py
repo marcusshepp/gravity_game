@@ -105,8 +105,7 @@ class GeneticTrainer:
         in: binary string, ie output for the 20 output nodes from ANN.
         out: x, y corrdinates
         """
-        return [int("".join([str(i) for i in out[:10]]), 2),
-                int("".join([str(i) for i in out[10:]]), 2)]
+        return [int("".join([str(i) for i in out[:10]]), 2), int("".join([str(i) for i in out[10:]]), 2)]
 
     def advance(self):
         """
